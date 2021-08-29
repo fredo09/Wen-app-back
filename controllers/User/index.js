@@ -109,7 +109,25 @@ const signIn = (req, res) => {
   });
 };
 
+const getUsers = async (req, res) => {
+  const listUsers = await User.find();
+
+  if (!listUsers) {
+    res.status(404).send({
+      status: "ERROR",
+      message: "No se ha encontrado ningun usuario.",
+    });
+  } else {
+    res.status(200).send({
+      status: "OK",
+      message: "Usuarios encontrados",
+      usuarios: listUsers,
+    });
+  }
+};
+
 module.exports = {
   signUp,
   signIn,
+  getUsers,
 };
