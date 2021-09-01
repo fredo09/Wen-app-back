@@ -126,8 +126,28 @@ const getUsers = async (req, res) => {
   }
 };
 
+const getUsersActived = async (req, res) => {
+  let query = req.query;
+
+  const listUserActived = await User.find({ actived: query.active });
+
+  if (!listUserActived) {
+    res.status(404).send({
+      status: "ERROR",
+      message: "No se ha encontrado ningun usuario",
+    });
+  } else {
+    res.status(201).send({
+      status: "OK",
+      message: "Usuarios encontrados",
+      usuariosAcvtive: listUserActived,
+    });
+  }
+};
+
 module.exports = {
   signUp,
   signIn,
   getUsers,
+  getUsersActived,
 };
