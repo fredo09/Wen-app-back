@@ -12,6 +12,9 @@ const {
   uploadAvatar,
   getAvatar,
   updateUser,
+  activateUser,
+  deleteUser,
+  createUser,
 } = require("../../controllers/User");
 const { verificaToken } = require("./../../middlewares/auth");
 
@@ -28,5 +31,8 @@ api.get("/users-actived", [verificaToken], getUsersActived);
 api.put("/updateAvatar/:id", [verificaToken, uploadAvatarM], uploadAvatar);
 api.get("/get-avatar/:avatarName", getAvatar);
 api.put("/updateUser/:id", [verificaToken], updateUser);
+api.put("/activate-User/:id", [verificaToken], activateUser);
+api.delete("/delete-user/:id", [verificaToken], deleteUser);
+api.post("/create-user", [verificaToken], createUser);
 
 module.exports = api;

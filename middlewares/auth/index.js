@@ -15,7 +15,6 @@ const { SECRET_KEY_JWT } = require("./../../config");
  */
 const verificaToken = async (req, res, next) => {
   //let token = req.get('token');
-
   if (!req.headers.authorization) {
     res.status(403).send({
       status: "ERROR",
@@ -23,7 +22,7 @@ const verificaToken = async (req, res, next) => {
     });
   }
 
-  const token = req.headers.authorization.replace(/['"']+/g, "");
+  const token = req.headers.authorization.replace(/['"]+/g, "");
 
   try {
     var payload = await jwt.decode(token, SECRET_KEY_JWT);

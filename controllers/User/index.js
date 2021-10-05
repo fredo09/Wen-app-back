@@ -233,9 +233,25 @@ const uploadAvatar = (req, res) => {
   });
 };
 
-const updateUser = (req, res) => {
+const updateUser = async (req, res) => {
   let body = req.body;
   let params = req.params;
+
+  body.email = req.body.email.toLowerCase();
+
+  //Encriptamos la contraseña
+  if (body.password) {
+    await byCrypt.hash(body.password, null, null, (err, hash) => {
+      if (err) {
+        res.status(500).send({
+          status: "ERROR",
+          message: "Problemas con la contraseña",
+        });
+      } else {
+        body.password = hash;
+      }
+    });
+  }
 
   User.findOneAndUpdate({ _id: params.id }, body, (err, userUpdate) => {
     if (err) {
@@ -259,6 +275,115 @@ const updateUser = (req, res) => {
   });
 };
 
+const activateUser = (req, res) => {
+  const { id } = req.params;
+  const { active } = req.body;
+
+  User.findByIdAndUpdate(id, { actived: active }, (err, userStored) => {
+    if (err) {
+      res.status(500).send({
+        status: "ERROR",
+        message: "Ocurrio un error en el servidor",
+      });
+    } else {
+      if (!userStored) {
+        res.status(404).send({
+          status: "ERROR",
+          message: "No se encontro el usuario",
+        });
+      } else {
+        if (active) {
+          res.status(201).send({
+            status: "OK",
+            message: "Se ha activado el usuario",
+          });
+        } else {
+          res.status(201).send({
+            status: "OK",
+            message: "Se ha desactivado el usuario",
+          });
+        }
+      }
+    }
+  });
+};
+
+const deleteUser = (req, res) => {
+  const { id } = req.params;
+
+  User.findByIdAndRemove(id, (err, userDelete) => {
+    if (err) {
+      res.status(500).send({
+        status: "ERROR",
+        message: "Error del servidor.",
+      });
+    } else {
+      if (!userDelete) {
+        res.status(404).send({
+          status: "ERROR",
+          message: "No se encontro el usuario.",
+        });
+      } else {
+        res.status(200).send({
+          status: "OK",
+          message: "Se elimino el usuario",
+        });
+      }
+    }
+  });
+};
+
+const createUser = (req, res) => {
+  const user = new User();
+
+  const { name, lastName, email, role, password } = req.body;
+
+  user.name = name;
+  user.lastName = lastName;
+  user.email = email;
+  user.role = role;
+  user.actived = true;
+
+  if (!password) {
+    res
+      .status(400)
+      .send({ status: "ERROR", message: "Error al encriptar contraseña." });
+  } else {
+    byCrypt.hash(password, null, null, (err, hash) => {
+      if (err) {
+        res
+          .status(500)
+          .send({ status: "ERROR", message: "Error en el servidor." });
+      } else {
+        user.password = hash;
+
+        // Guardamos el usuario nuevo
+        user.save((err, userStored) => {
+          if (err) {
+            res.status(500).send({
+              status: "ERROR",
+              message: "Usuario ya existente.",
+            });
+          } else {
+            if (!userStored) {
+              res.status(404).send({
+                status: "ERROR",
+                message: "Error al crear el usuario.",
+              });
+            } else {
+              res.status(200).send({
+                status: "OK",
+                message: "¡Usuario Creado!",
+                user: userStored,
+              });
+            }
+          }
+        });
+      }
+    });
+  }
+};
+
 module.exports = {
   signUp,
   signIn,
@@ -267,4 +392,7 @@ module.exports = {
   getAvatar,
   uploadAvatar,
   updateUser,
+  activateUser,
+  deleteUser,
+  createUser,
 };
