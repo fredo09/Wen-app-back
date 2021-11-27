@@ -122,10 +122,36 @@ const activeMenu = (req, res) => {
   });
 };
 
+const deleteMenu = (req, res) => {
+  const { id } = req.params;
+
+  Menu.findByIdAndRemove(id, (err, deletedMenu) => {
+    if (err) {
+      res.status(500).send({
+        status: "ERROR",
+        message: "Error del servidor.",
+      });
+    } else {
+      if (!deleteMenu) {
+        res.status(404).send({
+          status: "ERROR",
+          message: "No se han encontrado el menu",
+        });
+      } else {
+        res.status(201).send({
+          status: "OK",
+          message: "Se ha eliminado el menu.",
+        });
+      }
+    }
+  });
+};
+
 module.exports = {
   test,
   addMenu,
   getMenus,
   updateMenu,
   activeMenu,
+  deleteMenu,
 };
