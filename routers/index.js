@@ -10,10 +10,12 @@ const api = express();
 const UsersPath = require("./User");
 const AuthPath = require("./Auth");
 const MenuPath = require("./Menu");
+const PostPath = require("./Post");
 
 //Usando las rutas
 api.use(UsersPath);
 api.use(AuthPath);
 api.use(MenuPath);
+api.use(PostPath);
 
 module.exports = api;
